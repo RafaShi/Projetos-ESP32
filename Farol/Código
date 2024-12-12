@@ -1,0 +1,42 @@
+Código:
+
+#define LED_VERMELHO 19
+#define LED_AMARELO 18
+#define LED_VERDE 17
+
+void LedVermelho() {
+  digitalWrite(LED_VERMELHO, HIGH);
+  digitalWrite(LED_AMARELO, LOW);
+  digitalWrite(LED_VERDE, LOW);
+  delay(5000);
+}
+
+void LedAmarelo() {
+  digitalWrite(LED_VERMELHO, LOW);
+  digitalWrite(LED_AMARELO, HIGH);
+  digitalWrite(LED_VERDE, LOW);
+  delay(2000);
+}
+
+void LedVerde() {
+  digitalWrite(LED_VERMELHO, LOW);
+  digitalWrite(LED_AMARELO, LOW);
+  digitalWrite(LED_VERDE, HIGH);
+  delay(5000);
+}
+void setup() {
+  pinMode(LED_VERMELHO, OUTPUT);
+  pinMode(LED_AMARELO, OUTPUT);
+  pinMode(LED_VERDE, OUTPUT);
+  Serial.begin(115200);
+  Serial.println("Hello, ESP32!");
+}
+
+void loop() {
+  // Chama a função para ligar o LED vermelho
+  LedVermelho();
+  // Chama a função para ligar o LED amarelo
+  LedAmarelo();
+  // Chama a função para ligar o LED verde
+  LedVerde();
+}
