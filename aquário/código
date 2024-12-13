@@ -1,0 +1,95 @@
+#include <DHT.h>  
+
+// Definições de pinos
+#define DHTPIN 4 
+#define DHTTYPE DHT22
+#define LED_AZUL 19
+#define LED_AMARELO 18
+#define LED_VERMELHO 17
+#define POTENCIOMETRO 26
+
+DHT dht(DHTPIN, DHTTYPE);
+
+// Variáveis globais
+float temperaturaExterna = 0.0;
+float temperaturaIdeal = 25.0; // Valor ajustado pelo potenciômetro
+float temperaturaAgua = 25.0; // Temperatura da água que será ajustada
+bool aquecedorLigado = false;
+bool resfriadorLigado = false;
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("Controle de Temperatura do Aquário");
+
+  // Configuração dos pinos
+  pinMode(LED_AZUL, OUTPUT);
+  pinMode(LED_AMARELO, OUTPUT);
+  pinMode(LED_VERMELHO, OUTPUT);
+  dht.begin();
+}
+
+void loop() {
+  // Leitura da temperatura externa
+  temperaturaExterna = dht.readTemperature();
+
+  // Leitura do potenciômetro
+  int valorPot = analogRead(POTENCIOMETRO);
+  temperaturaIdeal = map(valorPot, 0, 4095, 20, 30); // Ajusta o intervalo de 20°C a 30°C
+
+  // Controle do aquecedor e resfriador
+  if (temperaturaAgua < temperaturaIdeal) {
+    aquecedorLigado = true;
+    resfriadorLigado = false;
+    temperaturaAgua += 0.2; // Simula aquecimento
+  } else if (temperaturaAgua > temperaturaIdeal) {
+    aquecedorLigado = false;
+    resfriadorLigado = true;
+    temperaturaAgua -= 0.1; // Simula resfriamento
+  } else {
+    aquecedorLigado = false;
+    resfriadorLigado = false;
+  }
+
+  // Controle dos LEDs
+  if (temperaturaAgua < temperaturaIdeal) {
+    // Temperatura Aquecendo - LED Vermelho
+    digitalWrite(LED_VERMELHO, HIGH);
+    digitalWrite(LED_AZUL, LOW);
+    digitalWrite(LED_AMARELO, LOW);
+  } else if (temperaturaAgua > temperaturaIdeal) {
+    // Temperatura Resfriando - LED Azul
+    digitalWrite(LED_VERMELHO, LOW);
+    digitalWrite(LED_AZUL, HIGH);
+    digitalWrite(LED_AMARELO, LOW);
+  } else {
+    // Temperatura ideal - LED Verde
+    digitalWrite(LED_VERMELHO, LOW);
+    digitalWrite(LED_AZUL, LOW);
+    digitalWrite(LED_AMARELO, HIGH);
+  }
+
+  // Mensagens
+  if (aquecedorLigado) {
+    Serial.println("Aquecedor Ligado");
+  } else if (resfriadorLigado) {
+    Serial.println("Resfriador Ligado");
+  } else {
+    Serial.println("Temperatura Ideal");
+  }
+
+  Serial.print("Temperatura Externa: ");
+  Serial.print(temperaturaExterna);
+  Serial.println(" °C");
+
+  Serial.print("Temperatura Ideal: ");
+  Serial.print(temperaturaIdeal);
+  Serial.println(" °C");
+
+  Serial.print("Temperatura da Água: ");
+  Serial.print(temperaturaAgua);
+  Serial.println(" °C");
+
+  Serial.println("---------------------------");
+
+  delay(3000);
+}
